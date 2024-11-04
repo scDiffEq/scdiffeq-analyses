@@ -15,21 +15,13 @@ There is no code associated with Figure 1. Included are the figure's source file
 
 There is no code associated with Figure 2C.
 
-### Figure 3
+### Figure 3 notebooks
 
-* Figure 3A: [notebook](./figure_3/notebooks/figure_3A.ipynb)
-* Figure 3B: [notebook](./figure_3/notebooks/figure_3B.ipynb)
-* Figure 3C: [notebook](./figure_3/notebooks/figure_3C.ipynb)
-* Figure 3D: [notebook](./figure_3/notebooks/figure_3D.ipynb)
-* Figure 3E: [notebook](./figure_3/notebooks/figure_3E.ipynb)
-* Figure 3F: [notebook](./figure_3/notebooks/figure_3F.ipynb)
-* Figure 3G: [notebook](./figure_3/notebooks/figure_3G.ipynb)
-* Figure 3H: [notebook](./figure_3/notebooks/figure_3H.ipynb)
-* Figure 3I: [notebook](./figure_3/notebooks/figure_3I.ipynb)
-* Figure 3J: [notebook](./figure_3/notebooks/figure_3J.ipynb)
-* Figure 3K: [notebook](./figure_3/notebooks/figure_3K.ipynb)
-* Figure 3L: [notebook](./figure_3/notebooks/figure_3L.ipynb)
-* Figure 3M: [notebook](./figure_3/notebooks/figure_3M.ipynb)
+* [Figure 3A,B](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/Figure3/notebooks/Figure3AB.ipynb)
+* [Figure 3C,D](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/Figure3/notebooks/Figure3CD.ipynb)
+* [Figure 3E,F,G](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/Figure3/notebooks/Figure3EFG.ipynb)
+* [Figure 3J](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/Figure3/notebooks/Figure3J.ipynb)
+* [Figure 3J - supplementary tables](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/Figure3/notebooks/Figure3J.make_supplementary_tables.ipynb)
 
 ### Figure 4
 
