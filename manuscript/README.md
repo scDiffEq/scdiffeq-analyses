@@ -30,3 +30,8 @@ There is no code associated with Figure 1. Included are the figure's source file
 ## Supplementary Figures
 
 * Supplementary Figure 1 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s1/notebooks/FigureS1.ipynb)
+* Supplementary Figure 2a [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s2/notebooks/FigureS2A.ipynb)
+* Supplementary Figure 2b [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s2/notebooks/FigureS2B.ipynb)
+* Supplementary Figure 2c [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s2/notebooks/FigureS2C.ipynb)
+* Supplementary Figure 3 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s3/notebooks/FigureS3.ipynb)
+* Supplementary Figure 4 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s4/notebooks/FigureS4.ipynb)
