@@ -27,10 +27,10 @@ There is no code associated with Figure 1. Included are the figure's source file
 
 * Figure 4a-c [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4ABC.ipynb)
 * Figure 4d
-* Figure 4e, f
+* Figure 4e, f [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4EF.ipynb)
 * Figure 4g [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4G.ipynb)
-* Figure 4h, i
-* Figure 4j-m
+* Figure 4h, i [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4HI.ipynb)
+* Figure 4j-m [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4JKLM.ipynb)
 
 ## Supplementary Figures
 
@@ -40,9 +40,9 @@ There is no code associated with Figure 1. Included are the figure's source file
 * Supplementary Figure 2c [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s2/notebooks/FigureS2C.ipynb)
 * Supplementary Figure 3 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s3/notebooks/FigureS3.ipynb)
 * Supplementary Figure 4 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s4/notebooks/FigureS4.ipynb)
-* Supplementary Figure 5
-* Supplementary Figure 6
-* Supplementary Figure 7
+* Supplementary Figure 5 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s5/notebooks/FigureS5.ipynb)
+* Supplementary Figure 6 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s6/notebooks/FigureS6.ipynb)
+* Supplementary Figure 7 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s7/notebooks/FigureS7.ipynb)
 * Supplementary Figure 8
 * Supplementary Figure 9
 * Supplementary Figure 10
