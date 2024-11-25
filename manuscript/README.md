@@ -47,3 +47,5 @@ There is no code associated with Figure 1. Included are the figure's source file
 * Supplementary Figure 9
 * Supplementary Figure 10
 * Supplementary Figure 11
+* Supplementary Figure 12
+* Supplementary Figure 13
