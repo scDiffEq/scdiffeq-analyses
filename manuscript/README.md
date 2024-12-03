@@ -26,7 +26,7 @@ There is no code associated with Figure 1. Included are the figure's source file
 ### Figure 4
 
 * Figure 4a-c [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4ABC.ipynb)
-* Figure 4d
+* Figure 4d [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4D.ipynb)
 * Figure 4e, f [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4EF.ipynb)
 * Figure 4g [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4G.ipynb)
 * Figure 4h, i [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_4/notebooks/Figure4HI.ipynb)
