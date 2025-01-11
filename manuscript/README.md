@@ -20,12 +20,11 @@ There is no code associated with Figure 1. Included are the figure's source file
 * Figure 3a,b: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3AB.ipynb)
 * Figure 3c, d: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3CD.ipynb)
 * Figure 3e-g: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3EFG.ipynb)
-* Figure 3h
-* Figure 3i
+* Figure 3h, i: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3HI.ipynb)
 * Figure 3j: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3J.ipynb)
 * Figure 3j - supplementary tables: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3J.make_supplementary_tables.ipynb)
-* Figure 3k, l
-* Figure 3m
+* Figure 3k, l: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3KL.ipynb)
+* Figure 3m: [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_3/notebooks/Figure3M.ipynb)
 
 ### Figure 4
 
@@ -49,6 +48,8 @@ There is no code associated with Figure 1. Included are the figure's source file
 * Supplementary Figure 7 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s7/notebooks/FigureS7.ipynb)
 * Supplementary Figure 8
 * Supplementary Figure 9 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s9/notebooks/FigureS9.ipynb)
-* Supplementary Figure 10
-* Supplementary Figure 11
-* Supplementary Figure 12
+* Supplementary Figure 10 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s10/notebooks/FigureS10.ipynb)
+* Supplementary Figure 11 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s11/notebooks/FigureS11.ipynb)
+* Supplementary Figure 12a-c [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s12/notebooks/FigureS12ABC.ipynb)
+* Supplementary Figure 12d [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s12/notebooks/FigureS12D.ipynb)
+* Supplementary Figure 12e-i [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s12/notebooks/FigureS12EFGHI.ipynb)
