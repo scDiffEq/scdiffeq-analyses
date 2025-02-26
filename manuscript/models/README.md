@@ -6,7 +6,7 @@ This directory contains pre-trained model checkpoints (saved as scDiffEq project
 ## LARRY Dataset
 
 - Models trained on the full dataset: [project](LARRY.full_dataset/LightningSDE-FixedPotential-RegularizedVelocityRatio)
-- Models trained for the fate-prediction benchmark task: [project](LARRY.fate_prediction/LightningSDE-FixedPotential-RegularizedVelocityRatio)\
+- Models trained for the fate-prediction benchmark task: [project](LARRY.fate_prediction/LightningSDE-FixedPotential-RegularizedVelocityRatio)
 
 ## Human Hematopoiesis
 
