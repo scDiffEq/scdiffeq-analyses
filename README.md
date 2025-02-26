@@ -4,7 +4,23 @@ Notebooks, figures, files, and helper functions to reproduce the analyses presen
 
 ## Overview
 
-## Manuscript reproducibility
+```shell
+scDiffEq/scdiffeq-analyses/
+├── manuscript/
+│   ├── figure_1/
+│   ├── figure_2/
+│   │   ├── figure_files/
+│   │   ├── notebooks/
+│   │   └── results/
+│   ├── figure_3/
+│   ...
+│   ├── models/
+│   └── supplementary_tables/
+│
+└── scdiffeq_analyses/
+```
+
+### Manuscript reproducibility
 
 **Notebooks, scripts, and other code to reproduce and/or use**:
 * Main figures
@@ -14,7 +30,9 @@ Notebooks, figures, files, and helper functions to reproduce the analyses presen
 
 ### Code and helper functions
 
-#### Installation
+These are contained in `scdiffeq_analyses/`
+
+### Installation
 
 ```bash
 git clone https://github.com/scDiffEq/scdiffeq-analyses.git;
