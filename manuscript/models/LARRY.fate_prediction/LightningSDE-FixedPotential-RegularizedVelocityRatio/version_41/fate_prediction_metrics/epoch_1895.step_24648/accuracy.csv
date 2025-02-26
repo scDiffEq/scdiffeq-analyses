@@ -1,0 +1,8 @@
+,accuracy
+all,0.5127342623738588
+unique_train.N/M,0.5319634703196348
+unique_train.N/M-early,0.3257918552036199
+unique_train.all_fates,0.4888535031847134
+unique_test.N/M,0.5512820512820513
+unique_test.N/M-early,0.31954887218045114
+unique_test.all_fates,0.5238649592549476
