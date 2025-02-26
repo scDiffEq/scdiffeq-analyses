@@ -53,3 +53,11 @@ There is no code associated with Figure 1. Included are the figure's source file
 * Supplementary Figure 12a-c [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s12/notebooks/FigureS12ABC.ipynb)
 * Supplementary Figure 12d [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s12/notebooks/FigureS12D.ipynb)
 * Supplementary Figure 12e-i [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/figure_s12/notebooks/FigureS12EFGHI.ipynb)
+
+## Trained model checkpoints
+* LARRY dataset (full): [project](LARRY.full_dataset/LightningSDE-FixedPotential-RegularizedVelocityRatio)
+* LARRY (fate-prediction task): [project](LARRY.fate_prediction/LightningSDE-FixedPotential-RegularizedVelocityRatio)
+* Human hematopoiesis: [project](human_hematopoiesis/LightningSDE-FixedPotential-RegularizedVelocityRatio)
+* Mouse Pancreatic Endocrinogenesis: [project](pancreas/LightningSDE-FixedPotential-RegularizedVelocityRatio)
+
+
