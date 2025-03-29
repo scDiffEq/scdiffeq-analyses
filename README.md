@@ -36,6 +36,6 @@ These are contained in `scdiffeq_analyses/`
 
 ```bash
 git clone https://github.com/scDiffEq/scdiffeq-analyses.git;
-cd scdiffeq-analyses; pip install scdiffeq-analyses
+cd scdiffeq-analyses; pip install -e .
 ```
 
