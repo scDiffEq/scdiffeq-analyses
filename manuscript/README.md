@@ -61,3 +61,6 @@ There is no code associated with Figure 1. Included are the figure's source file
 * Mouse Pancreatic Endocrinogenesis: [project](pancreas/LightningSDE-FixedPotential-RegularizedVelocityRatio)
 
 
+## New supplementary figures (currently incorporating into manuscript for revision)
+* Supplementary Figure 9 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/new_suppl_figs/figure_s9/notebooks/FigureS9.ipynb)
+* Supplementary Figure 11 [notebook](https://github.com/scDiffEq/scdiffeq-analyses/blob/main/manuscript/new_suppl_figs/figure_s11/notebooks/FigureS11.ipynb)
