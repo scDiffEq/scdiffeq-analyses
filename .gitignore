@@ -1,4 +1,13 @@
+# macOS
 .DS_Store
+
+# Python
+.venv/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
