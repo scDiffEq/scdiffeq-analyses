@@ -2,6 +2,7 @@
 import anndata
 import numpy as np
 import pathlib
+import scdiffeq as sdq
 import torch
 
 # -- set type hints: ----------------------------------------------------------
@@ -17,7 +18,8 @@ def annotate_adata_with_growth_weights(
     time_point: int = 2,
 ):
 
-    weight_pt = torch.load(growth_weights_path, weights_only=False)
+    weight_pt = sdq.datsets.larry_growth_weights()
+    # weight_pt = torch.load(growth_weights_path, weights_only=False)
     W = np.ones(len(adata))
     W[adata.obs[time_key] == time_point] = weight_pt["w"][0]
     adata.obs[weight_key] = W
