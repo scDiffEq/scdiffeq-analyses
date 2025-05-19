@@ -40,7 +40,7 @@ def monitor_memory_and_logs():
     while True:
         log_memory_usage()
         logger.info(f"Process is still running at {time.strftime('%H:%M:%S')}")
-        time.sleep(0.1)  # Log every 1 seconds
+        time.sleep(int(60*10))  # Log every 1 seconds
 
 
 try:
