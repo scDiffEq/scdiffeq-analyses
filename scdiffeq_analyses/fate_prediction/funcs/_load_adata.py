@@ -15,21 +15,23 @@ logger = logging.getLogger(__name__)
 # -- define function: ---------------------------------------------------------
 def load_adata(
     h5ad_path: Union[pathlib.Path, str],
-    growth_weights_path: Optional[Union[pathlib.Path, str]] = None,
     weight_key: str = "W",
     time_key: str = "Time point",
     time_point: int = 2,
 ) -> None:
-    print("Loading adata...")
-    adata = anndata.read_h5ad(h5ad_path, silent=True)
+
+    logger.info(f"Loading adata from {h5ad_path}...")
+    adata = anndata.read_h5ad(h5ad_path)
 
     # -- UPDATE TO TRAIN ONLY ON WELLS 0, 1: ----------------------------
     adata.obs["train"] = adata.obs["Well"].isin([0, 1])
 
-    if not growth_weights_path is None:
-        logger.info("Annotating adata with gro    wth weights...")
-        adata = annotate_adata_with_growth_weights(
-            adata, growth_weights_path, weight_key, time_key, time_point
-        )
-        logger.info(f"\nAnnData prepared:\n{adata}")
+    logger.info("Annotating adata with growth weights...")
+    adata = annotate_adata_with_growth_weights(
+        adata=adata,
+        weight_key=weight_key,
+        time_key=time_key,
+        time_point=time_point,
+    )
+    logger.info(f"\nAnnData prepared:\n{adata}")
     return adata
