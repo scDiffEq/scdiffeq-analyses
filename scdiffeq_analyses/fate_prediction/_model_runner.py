@@ -139,7 +139,9 @@ class Runner(ABCParse.ABCParse):
             wandb_logger: wandb.sdk.wandb_run.Run,
         ) -> Tuple[wandb.sdk.wandb_run.Run, Dict[str, Any]]:
         """Update the wandb parameters and return the wandb logger and params."""
-        wandb_logger.experiment.config.update(params)
+        # Create a copy of params excluding the adata object to prevent serialization issues
+        wandb_params = {k: v for k, v in params.items() if k != "adata"}
+        wandb_logger.experiment.config.update(wandb_params)
         wandb_logger.experiment.config.update({"h5ad_path": self._h5ad_path})
         wandb_logger.experiment.config.update({"run_id": run_id})
         params["logger"] = wandb_logger

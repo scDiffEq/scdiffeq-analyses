@@ -5,7 +5,7 @@ import pathlib
 from ._model_runner import Runner
 
 # -- import external dependencies: --------------------------------------------
-from typing import Dict, List, Optional, Union
+from typing import Dict, List
 
 
 # -- define function: --------------------------------------------------------
