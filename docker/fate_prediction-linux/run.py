@@ -1,21 +1,18 @@
 # -- import packages: ---------------------------------------------------------
+import autodevice
+import gc
+import larry
+import logging
+import os
 import scdiffeq as sdq
 import scdiffeq_analyses as sdq_an
-import larry
-import os
+import sys
+import torch
+import traceback
 import wandb
 import yaml
-import sys
-import traceback
-import logging
-import gc
-import psutil
-import time
-import threading
-import torch
-import autodevice
 
-# Configure logging
+# -- configure logger: --------------------------------------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -28,28 +25,8 @@ logging.getLogger("scdiffeq").setLevel(logging.INFO)
 logging.getLogger("scdiffeq_analyses").setLevel(logging.INFO)
 
 
-def log_memory_usage():
-    """Log current memory usage"""
-    process = psutil.Process(os.getpid())
-    mem_info = process.memory_info()
-    logger.info(f"Memory usage: {mem_info.rss / 1024 / 1024:.2f} MB")
-
-
-def monitor_memory_and_logs():
-    """Background thread to monitor memory usage and process existence"""
-    while True:
-        log_memory_usage()
-        logger.info(f"Process is still running at {time.strftime('%H:%M:%S')}")
-        time.sleep(int(60*10))  # Log every 1 seconds
-
-
 try:
     logger.info("Starting fate prediction process")
-
-    # Start background monitoring thread
-    monitor_thread = threading.Thread(target=monitor_memory_and_logs, daemon=True)
-    monitor_thread.start()
-
     # Log MPS availability and autodevice selection
     logger.info(f"Torch MPS available: {torch.backends.mps.is_available()}")
     try:
@@ -98,7 +75,6 @@ try:
         )
 
     logger.info(f"Using h5ad file: {h5ad_path}")
-    log_memory_usage()
 
     # Run fate prediction with config
     logger.info("Starting fate prediction run")
@@ -157,8 +133,6 @@ try:
     try:
         # Force garbage collection before starting
         gc.collect()
-        log_memory_usage()
-
         logger.info("Loading h5ad file...")
         # We're not loading the h5ad file here directly, but it's a good checkpoint
 
@@ -201,8 +175,6 @@ try:
         logger.error(f"Error during run_fate_prediction: {str(e)}")
         logger.error(traceback.format_exc())
         raise
-
-    log_memory_usage()
     logger.info("Process completed successfully")
 
 except Exception as e:
