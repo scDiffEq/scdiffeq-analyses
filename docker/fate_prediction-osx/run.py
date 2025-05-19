@@ -12,6 +12,8 @@ import gc
 import psutil
 import time
 import threading
+import torch
+import autodevice
 
 # Configure logging
 logging.basicConfig(
@@ -36,7 +38,7 @@ def monitor_memory_and_logs():
     while True:
         log_memory_usage()
         logger.info(f"Process is still running at {time.strftime('%H:%M:%S')}")
-        time.sleep(60)  # Log every minute
+        time.sleep(0.1)  # Log every 1 seconds
 
 try:
     logger.info("Starting fate prediction process")
@@ -44,6 +46,14 @@ try:
     # Start background monitoring thread
     monitor_thread = threading.Thread(target=monitor_memory_and_logs, daemon=True)
     monitor_thread.start()
+    
+    # Log MPS availability and autodevice selection
+    logger.info(f"Torch MPS available: {torch.backends.mps.is_available()}")
+    try:
+        selected_device = autodevice.AutoDevice()
+        logger.info(f"Autodevice selected: {selected_device}")
+    except Exception as e:
+        logger.error(f"Error getting autodevice: {e}")
     
     for package in [sdq, sdq_an, larry]:
         logger.info(f"{package.__name__}: {package.__version__}")
