@@ -1,0 +1,3 @@
+from ._annotate_adata_with_growth_weights import annotate_adata_with_growth_weights
+
+__all__ = ["annotate_adata_with_growth_weights"]
