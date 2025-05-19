@@ -9,6 +9,7 @@ import pathlib
 import scdiffeq as sdq
 import uuid
 import wandb
+import os
 
 # -- import local dependencies: -----------------------------------------------
 from . import funcs
@@ -27,8 +28,9 @@ class Runner(ABCParse.ABCParse):
         self,
         h5ad_path: Union[pathlib.Path, str],
         project_name: str,
+        wandb_api_key: str,
         time_key: str = "median_qbin",  # "t",  # "Time point",
-        growth_weights_path: Optional[Union[pathlib.Path, str]] = None,
+        time_point: float = 2,
         weight_key: str = "W",
         ckpt_frequency=1,
         save_last_ckpt=True,
@@ -40,17 +42,22 @@ class Runner(ABCParse.ABCParse):
             h5ad_path (Union[pathlib.Path, str]): Path to the h5ad file.
             project_name (str): Name of the project.
             time_key (str): Key for the time point.
-            growth_weights_path (Optional[Union[pathlib.Path, str]]): Path to the growth weights file.
             weight_key (str): Key for the weight.
+            wandb_api_key (str): API key for wandb.
+            ckpt_frequency (int): Frequency of saving checkpoints.
+            save_last_ckpt (bool): Whether to save the last checkpoint.
+            keep_ckpts (int): Number of checkpoints to keep.
+            monitor (str): Metric to monitor.
         """
         self.__parse__(locals())
+
+        wandb.login(key=self._wandb_api_key)
 
     @property
     def adata(self) -> anndata.AnnData:
         if not hasattr(self, "_ADATA"):
             self._ADATA = funcs.load_adata(
                 h5ad_path=self._h5ad_path,
-                growth_weights_path=self._growth_weights_path,
                 weight_key=self._weight_key,
                 time_key="Time point", # real time points
             )
@@ -75,6 +82,21 @@ class Runner(ABCParse.ABCParse):
         )
         artifact.add_file(__file__)
         wandb.log_artifact(artifact)
+
+    def _format_ckpt_fname(self, ckpt_fpath: pathlib.Path):
+        return ckpt_fpath.name.split(".")[0].replace("=", "_").replace("-", ".")
+
+    def _log_model_ckpt_as_wandb_artifact(self, seed, ckpt_fpath, run_id):
+
+        ckpt_fname = self._format_ckpt_fname(ckpt_fpath)
+
+        artifact = wandb.Artifact(
+            name=f"model-ckpt-seed_{seed}-{ckpt_fname}-run_id-{run_id}", type="model"
+        )
+        artifact.add_file(ckpt_fpath)
+        wandb.log_artifact(artifact)
+
+        return ckpt_fname
 
     def _compose_model_params(self, seed: int) -> Dict[str,Any]:
         return {
@@ -132,10 +154,13 @@ class Runner(ABCParse.ABCParse):
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: CONSTRUCTED")
         return wandb_logger, params, run_id
 
-    def _wandb_fate_prediction_metrics_logging(self, seed: int, run_id: str) -> None:
+    def _wandb_fate_prediction_metrics_logging(
+        self, seed: int, run_id: str, ckpt_fpath
+    ) -> None:
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: SETUP WANDB FATE PREDICTION METRICS LOGGING")
+        ckpt_fname = self._format_ckpt_fname(ckpt_fpath)
         artifact = wandb.Artifact(
-            name=f"fate-prediction-metrics-seed_{seed}-run_id_{run_id}",
+            name=f"fate-prediction-metrics-seed_{seed}-{ckpt_fname}-run_id_{run_id}",
             type="model-prediction-task",
             metadata={"N": self._n_eval, "seed": seed, "run_id": run_id},
         )
@@ -161,9 +186,24 @@ class Runner(ABCParse.ABCParse):
             train_callbacks=[SWA_CALLBACK, self._FATE_PREDICTION_CALLBACK],
         )
 
+        # -- note: callback automatically performs eval at pl_module.on_train_end()
+        # Ensure checkpoint directory exists
+        os.makedirs(self._CKPT_DIR, exist_ok=True)
+        
+        # Save the checkpoint manually
+        ckpt_fname = f"on_train_end.epoch_{self.model.DiffEq.current_epoch}.ckpt"
+        ckpt_fpath = self._CKPT_DIR.joinpath(ckpt_fname)
+        self.model.DiffEq.trainer.save_checkpoint(ckpt_fpath)
+        logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: SAVED CHECKPOINT: {ckpt_fpath}")
+        
+        self._log_model_ckpt_as_wandb_artifact(seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id)
+        self._wandb_fate_prediction_metrics_logging(
+            seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath
+        )
+
     def fate_prediction_evaluation(self, seed: int, ckpt_fpath: pathlib.Path, run_id: str) -> None:
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: EVALUATING CKPT: {ckpt_fpath}")
-        ckpt_fname = self.log_wandb_model_artifact(
+        ckpt_fname = self._log_model_ckpt_as_wandb_artifact(
             seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id
         )
 
@@ -172,12 +212,12 @@ class Runner(ABCParse.ABCParse):
         self._FATE_PREDICTION_CALLBACK.forward(
             pl_module=self.model.DiffEq, ckpt_name=ckpt_fname, log_dir=self._LOG_DIR
         )
-        self._wandb_fate_prediction_metrics_logging(seed=seed, run_id=run_id)
+        self._wandb_fate_prediction_metrics_logging(seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath)
 
     def evaluate_model(self, seed: int, run_id: str) -> None:
 
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: EVALUATING")
-        self._wandb_fate_prediction_metrics_logging(seed=seed, run_id=run_id)
+
         for ckpt_fpath in self._CKPT_PATHS:
             self.fate_prediction_evaluation(
                 seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id
@@ -187,7 +227,7 @@ class Runner(ABCParse.ABCParse):
         wandb.init(project=self._project_name)
         wandb_logger, params, run_id = self._setup_run(seed=seed)
         self.fit_model(seed=seed, run_id=run_id, params=params)
-        self.evaluate_model()
+        self.evaluate_model(seed=seed, run_id=run_id)
         wandb.finish()
 
     def __call__(
