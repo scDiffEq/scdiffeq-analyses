@@ -5,4 +5,10 @@ import larry
 import os
 
 for package in [sdq, sdq_an, larry]:
-    print(package.__version__)
+    print(f"{package.__name__}: {package.__version__}")
+
+sdq_an.fate_prediction.run_fate_prediction(
+    project_name="fate_prediction.testing_docker_linux",
+    h5ad_path="/app/static/Weinreb2020_growth-all_kegg.h5ad",
+    time_key="t",
+)
