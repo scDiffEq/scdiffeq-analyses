@@ -42,7 +42,7 @@ docker run --rm \
   -v /home/yourname/config.yaml:/app/config.yaml \
   -v /home/yourname/input:/data \
   -e WANDB_API_KEY=<your_wandb_key> \
-  michaelvinyard/fate_prediction:linux
+  mvinyard/fate_prediction:linux
 ```
 
 
