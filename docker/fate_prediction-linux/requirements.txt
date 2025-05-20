@@ -1,0 +1,6 @@
+scdiffeq==v0.1.8
+scdiffeq-analyses==v0.0.2rc4
+LARRY-dataset==v0.1.0dev5
+wandb
+pyyaml
+psutil
