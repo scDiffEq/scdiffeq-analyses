@@ -2,3 +2,4 @@ project_name: "scdiffeq-computational-complexity"
 N: 10_000
 seed: 7
 n_bins: 5
+dt: 0.1

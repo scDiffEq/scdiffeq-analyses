@@ -1,14 +1,11 @@
 # -- import packages: ---------------------------------------------------------
-import autodevice
 import gc
 import logging
 import os
 import scdiffeq as sdq
 import scdiffeq_analyses as sdq_an
 import sys
-import torch
 import traceback
-import wandb
 import yaml
 
 # -- configure logger: --------------------------------------------------------
@@ -55,6 +52,7 @@ try:
         "seed": config.get("seed"),
         "n_bins": config.get("n_bins"),
         "project_name": config.get("project_name"),
+        "dt": config.get("dt"),
     }
 
     # Log parameters being used
@@ -76,6 +74,7 @@ try:
         N=params["N"],
         seed=params["seed"],
         n_bins=params["n_bins"],
+        dt=params["dt"],
     )
 
 except Exception as e:
