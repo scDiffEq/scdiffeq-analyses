@@ -54,6 +54,7 @@ try:
         "N": config.get("N"),
         "seed": config.get("seed"),
         "n_bins": config.get("n_bins"),
+        "project_name": config.get("project_name"),
     }
 
     # Log parameters being used
@@ -69,7 +70,7 @@ try:
     experiment = sdq_an.computational_complexity.ExperimentRunner(
         adata=adata,
         wandb_api_key=wandb_api_key,
-        project_name="complexity.testing",
+        project_name=params["project_name"],
     )
     experiment(
         N=params["N"],
@@ -79,56 +80,5 @@ try:
 
 except Exception as e:
     logger.error(f"Fatal error: {e}")
-    logger.error(traceback.format_exc())
-    sys.exit(1)
-
-    try:
-
-        logger.info("Loading h5ad file...")
-        # We're not loading the h5ad file here directly, but it's a good checkpoint
-
-        logger.info("About to start run_fate_prediction function")
-
-        # Add more verbose logging around model construction
-        logger.info("Calling run_fate_prediction with all parameters")
-        sdq_an.fate_prediction.run_fate_prediction(
-            project_name=params["project_name"],
-            h5ad_path=params["h5ad_path"],
-            wandb_api_key=params["wandb_api_key"],
-            time_key=params["time_key"],
-            n_seeds=params["n_seeds"],
-            seeds=params["seeds"],
-            train_epochs=params["train_epochs"],
-            batch_size=params["batch_size"],
-            train_lr=params["train_lr"],
-            n_eval=params["n_eval"],
-            swa_lrs=params["swa_lrs"],
-            mu_hidden=params["mu_hidden"],
-            sigma_hidden=params["sigma_hidden"],
-            train_step_size=params["train_step_size"],
-            mu_dropout=params["mu_dropout"],
-            sigma_dropout=params["sigma_dropout"],
-            coef_diffusion=params["coef_diffusion"],
-            diffeq_type=params["diffeq_type"],
-            use_key=params["use_key"],
-            potential_type=params["potential_type"],
-            latent_dim=params["latent_dim"],
-            weight_key=params["weight_key"],
-            time_point=params["time_point"],
-            ckpt_frequency=params["ckpt_frequency"],
-            save_last_ckpt=params["save_last_ckpt"],
-            keep_ckpts=params["keep_ckpts"],
-            monitor=params["monitor"],
-            velocity_ratio_params=velocity_ratio_params,
-        )
-        logger.info("Fate prediction completed successfully")
-    except Exception as e:
-        logger.error(f"Error during run_fate_prediction: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise
-    logger.info("Process completed successfully")
-
-except Exception as e:
-    logger.error(f"Fatal error: {str(e)}")
     logger.error(traceback.format_exc())
     sys.exit(1)
