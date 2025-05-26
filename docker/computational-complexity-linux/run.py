@@ -78,7 +78,7 @@ try:
         seed=params["seed"],
         n_bins=params["n_bins"],
         dt=params["dt"],
-        batch_size=paramgs["batch_size"],
+        batch_size=params["batch_size"],
     )
 
 except Exception as e:
