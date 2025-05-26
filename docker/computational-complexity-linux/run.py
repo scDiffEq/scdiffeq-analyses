@@ -53,6 +53,8 @@ try:
         "n_bins": config.get("n_bins"),
         "project_name": config.get("project_name"),
         "dt": config.get("dt"),
+        "train_epochs": config.get("train_epochs"),
+	"batch_size": config.get("batch_size"),
     }
 
     # Log parameters being used
@@ -69,12 +71,14 @@ try:
         adata=adata,
         wandb_api_key=wandb_api_key,
         project_name=params["project_name"],
+        train_epochs=params["train_epochs"],
     )
     experiment(
         N=params["N"],
         seed=params["seed"],
         n_bins=params["n_bins"],
         dt=params["dt"],
+        batch_size=paramgs["batch_size"],
     )
 
 except Exception as e:
