@@ -9,7 +9,7 @@ def get_conditions(condition):
     defaults = {
         "mu_hidden": [512, 512],
         "sigma_hidden": [32, 32],
-        "velocity_ratio": {"enforce": 100},
+        "velocity_ratio": {"enforce": 100, "target": 2.5},
         "seed": -1,
     }
     updated_condition = {}
@@ -18,8 +18,10 @@ def get_conditions(condition):
             val = condition[key]
         updated_condition[key] = val
     E = updated_condition["velocity_ratio"]["enforce"]
+    V = updated_condition["velocity_ratio"]["target"]
     updated_condition.pop("velocity_ratio")
     updated_condition["E"] = E
+    updated_condition["V"] = V
     return updated_condition
 
 

@@ -18,6 +18,7 @@ def summarize_runs(complete_runs: List[Run]) -> pd.DataFrame:
                 "mu_hidden": str(run.mu_hidden),
                 "sigma_hidden": str(run.sigma_hidden),
                 "E": str(run.velocity_ratio_params_enforce),
+                "V": str(run.velocity_ratio_params_target),
                 "seed": run.seed,
                 "name": run.name,
             }
@@ -30,6 +31,7 @@ def summarize_runs(complete_runs: List[Run]) -> pd.DataFrame:
             "name",
             "mu_hidden",
             "sigma_hidden",
+            "V",
             "E",
             "seed",
             "best_epoch",

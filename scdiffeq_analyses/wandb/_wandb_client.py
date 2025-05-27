@@ -26,6 +26,7 @@ class WandbClient:
             "mu_hidden",
             "sigma_hidden",
             "velocity_ratio_params/enforce",
+            "velocity_ratio_params/target",
         ],
         n_target_files: int = 5,
     ) -> None:

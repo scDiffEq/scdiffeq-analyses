@@ -5,6 +5,9 @@ import pathlib
 import pandas as pd
 import wandb
 
+# -- import local dependencies: -----------------------------------------------
+from ._download_run_history import download_run_history
+
 # -- set type hints: ----------------------------------------------------------
 from typing import Any, Dict, List, Union
 
@@ -22,6 +25,7 @@ class Run:
             "mu_hidden",
             "sigma_hidden",
             "velocity_ratio_params/enforce",
+            "velocity_ratio_params/target",
         ],
         base_path: Union[pathlib.Path, str] = pathlib.Path(
             "scdiffeq_data/wandb_downloads"
@@ -104,46 +108,54 @@ class Run:
             f"{already_downloaded} files already downloaded. {newly_downloaded} files newly downloaded."
         )
 
-    def _get_history_path(self):
-        history_dirs = [path for path in self._artifact_dirs if "history" in str(path.name)]
+    # def _get_history_path(self):
+    #     history_dirs = [path for path in self._artifact_dirs if "history" in str(path.name)]
 
-        if not history_dirs:
-            raise FileNotFoundError(
-                f"No artifact directory containing 'history' found for run {self.id} in {self.dir}. "
-                f"Available artifact_dirs: {[p.name for p in self._artifact_dirs]}"
-            )
+    #     if not history_dirs:
+    #         raise FileNotFoundError(
+    #             f"No artifact directory containing 'history' found for run {self.id} in {self.dir}. "
+    #             f"Available artifact_dirs: {[p.name for p in self._artifact_dirs]}"
+    #         )
 
-        # Use the first directory found that contains "history"
-        history_dir = history_dirs[0]
-        if len(history_dirs) > 1:
-            logger.warning(
-                f"Multiple artifact directories containing 'history' found for run {self.id}: "
-                f"{[p.name for p in history_dirs]}. Using '{history_dir.name}'."
-            )
+    #     # Use the first directory found that contains "history"
+    #     history_dir = history_dirs[0]
+    #     if len(history_dirs) > 1:
+    #         logger.warning(
+    #             f"Multiple artifact directories containing 'history' found for run {self.id}: "
+    #             f"{[p.name for p in history_dirs]}. Using '{history_dir.name}'."
+    #         )
 
-        parquet_files = sorted(list(history_dir.glob("*.parquet")))
+    #     parquet_files = sorted(list(history_dir.glob("*.parquet")))
 
-        if not parquet_files:
-            raise FileNotFoundError(
-                f"No .parquet file found in history artifact directory '{history_dir}' for run {self.id}."
-            )
+    #     if not parquet_files:
+    #         raise FileNotFoundError(
+    #             f"No .parquet file found in history artifact directory '{history_dir}' for run {self.id}."
+    #         )
 
-        history_file_path = parquet_files[0]
-        if len(parquet_files) > 1:
-            logger.warning(
-                f"Multiple .parquet files found in '{history_dir}': "
-                f"{[p.name for p in parquet_files]}. Using '{history_file_path.name}'."
-            )
+    #     history_file_path = parquet_files[0]
+    #     if len(parquet_files) > 1:
+    #         logger.warning(
+    #             f"Multiple .parquet files found in '{history_dir}': "
+    #             f"{[p.name for p in parquet_files]}. Using '{history_file_path.name}'."
+    #         )
         
-        return history_file_path
+    #     return history_file_path
+
+    @property
+    def history_path(self) -> pathlib.Path:
+        return self.dir.joinpath("history.csv")
 
     @property
     def history(self) -> pd.DataFrame:
-        if not hasattr(self, "_history"):
-            if not self._DOWNLOAD_CALLED:
-                self.download_artifacts()
-            self._history = pd.read_parquet(self._get_history_path())
+        if self._run.state == "finished" and (not hasattr(self, "_history")):
+            if not self.history_path.exists():
+                self._history = download_run_history(self._run, self.history_path)
+            else:
+                self._history = pd.read_csv(self.history_path)
+        else:
+            self._history = None
         return self._history
+
 
     def _select_paths(self, key) -> list:
         return [
