@@ -3,7 +3,6 @@ from ._wandb_client import WandbClient
 from ._get_best_ckpt import get_best_ckpt
 from ._summarize_run_accuracy import summarize_run_accuracy
 from ._summarize_runs import summarize_runs
-from ._completion import track_completion
 from ._download_run_history import download_run_history
 
 __all__ = [
@@ -12,6 +11,5 @@ __all__ = [
     "get_best_ckpt",
     "summarize_run_accuracy",
     "summarize_runs",
-    "track_completion",
     "download_run_history",
 ]

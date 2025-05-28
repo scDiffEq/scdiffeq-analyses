@@ -2,7 +2,7 @@
 import pandas as pd
 
 # -- import local dependencies: -----------------------------------------------
-from .. import hp_scan
+from ._conditions import conditions
 
 # -- function: ----------------------------------------------------------------
 def get_conditions(condition):
@@ -39,7 +39,7 @@ def check_completion_tracker(tracked_completion_dict: dict):
 
 
 def track_completion(summary_df):
-    CONDITIONS = hp_scan.conditions.copy()
+    CONDITIONS = conditions.copy()
     available_index = list(summary_df.index).copy()
     used_index = []
     extras = []  # we want to avoid these
