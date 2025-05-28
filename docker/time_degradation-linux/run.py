@@ -24,7 +24,7 @@ import sklearn.decomposition
 def get_larry(n_bins: int):
     """Does the fate prediction preprocessing."""
 
-    adata = sdq.datasets.larry()
+    adata = sdq.datasets.larry(data_dir="/data/")
 
     scaler = sklearn.preprocessing.StandardScaler()
     PCA = sklearn.decomposition.PCA(n_components=50)
@@ -37,7 +37,7 @@ def get_larry(n_bins: int):
     adata.obsm["X_scaled"] = scaler.transform(adata.X.toarray())
     adata.obsm["X_pca"] = PCA.transform(adata.obsm["X_scaled"])
 
-    h5ad_path = "scdiffeq_data/larry/larry.adata.pp.h5ad"
+    h5ad_path = "/data/scdiffeq_data/larry/larry.adata.pp.h5ad"
 
     sdq.tl.bin_pseudotime(adata, pseudotime_key="ct_pseudotime", n_bins=n_bins)
 
@@ -45,10 +45,10 @@ def get_larry(n_bins: int):
 
     adata.write_h5ad(h5ad_path)
 
-    with open("scdiffeq_data/larry/larry.pca.pkl", "wb") as file:
+    with open("/data/scdiffeq_data/larry/larry.pca.pkl", "wb") as file:
         pickle.dump(PCA, file)
 
-    with open("scdiffeq_data/larry/larry.scaler.pkl", "wb") as file:
+    with open("/data/scdiffeq_data/larry/larry.scaler.pkl", "wb") as file:
         pickle.dump(scaler, file)
 
     return h5ad_path
