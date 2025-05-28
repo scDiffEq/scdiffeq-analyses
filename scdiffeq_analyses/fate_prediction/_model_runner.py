@@ -7,6 +7,7 @@ import larry
 import logging
 import pathlib
 import scdiffeq as sdq
+import shutil
 import uuid
 import wandb
 import os
@@ -191,17 +192,24 @@ class Runner(ABCParse.ABCParse):
         # -- note: callback automatically performs eval at pl_module.on_train_end()
         # Ensure checkpoint directory exists
         os.makedirs(self._CKPT_DIR, exist_ok=True)
-        
+
         # Save the checkpoint manually
         ckpt_fname = f"on_train_end.epoch_{self.model.DiffEq.current_epoch}.ckpt"
         ckpt_fpath = self._CKPT_DIR.joinpath(ckpt_fname)
         self.model.DiffEq.trainer.save_checkpoint(ckpt_fpath)
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: SAVED CHECKPOINT: {ckpt_fpath}")
-        
+
         self._log_model_ckpt_as_wandb_artifact(seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id)
         self._wandb_fate_prediction_metrics_logging(
             seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath
         )
+
+    def export_model_ckpts(self, seed: int, run_id: str) -> None:
+        
+        output_dir = pathlib.Path(f"/output/run_id_{run_id}-seed_{seed}")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        for ckpt_fpath in self._CKPT_PATHS:
+            shutil.copy(ckpt_fpath, output_dir)
 
     def fate_prediction_evaluation(self, seed: int, ckpt_fpath: pathlib.Path, run_id: str) -> None:
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: EVALUATING CKPT: {ckpt_fpath}")
@@ -229,6 +237,7 @@ class Runner(ABCParse.ABCParse):
         wandb.init(project=self._project_name)
         wandb_logger, params, run_id = self._setup_run(seed=seed)
         self.fit_model(seed=seed, run_id=run_id, params=params)
+        self.export_model_ckpts(seed=seed, run_id=run_id)
         self.evaluate_model(seed=seed, run_id=run_id)
         wandb.finish()
 
