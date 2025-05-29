@@ -48,15 +48,15 @@ class StyledBoxPlot(ABCParse.ABCParse):
 
     def forward(self) -> None:
         bp = BoxPlot(boxplot_kwargs = self.FOREGROUND_KWARGS, colors=self._colors)
-        self.fore_bp = bp(ax=self.ax, data = self._data, mode = "foreground")
+        self.fore_bp = bp(ax=self.ax, data = self._data, mode = "foreground", use_x = self._use_x)
         bp = BoxPlot(boxplot_kwargs = self.BACKGROUND_KWARGS, colors=self._colors)
-        self.back_bp = bp(ax=self.ax, data = self._data, mode = "background")
+        self.back_bp = bp(ax=self.ax, data = self._data, mode = "background", use_x = self._use_x)
         if not self._suppress_scatter:
             foreground_scatter = ForegroundScatter(
                 colors = self._colors,
                 scatter_kw = self._scatter_kw,
             )
-            foreground_scatter(ax=self.ax, data = self._data)
+            foreground_scatter(ax=self.ax, data = self._data, use_x = self._use_x)
 
         for en, (k, v) in enumerate(self._data.items()):
             if len(v) == 1:
@@ -68,13 +68,13 @@ class StyledBoxPlot(ABCParse.ABCParse):
                     alpha = self._scatter_kw["alpha"],
                 )
 
-    def __call__(self, data, ax: Optional[plt.Axes] = None) -> None:
+    def __call__(self, data, ax: Optional[plt.Axes] = None, use_x: bool = False) -> None:
         self._data = data
         if ax is None:
             fig, axes = cellplots.plot()
             ax = axes[0]
         self.ax = ax
-
+        self._use_x = use_x
         self.forward()
 
 
@@ -84,6 +84,8 @@ def boxplot(
     colors: Optional[List[str]] = cm.tab20.colors,
     widths: Optional[float] = 0.85,
     suppress_scatter: bool = False,
+    use_x: bool = False,
+    jitter: bool = True,
     scatter_kw={
         "alpha": 0.8,
         "s": 35,
@@ -102,5 +104,5 @@ def boxplot(
         *args,
         **kwargs,
     )
-    cls(data, ax)
+    cls(data, ax, use_x=use_x, jitter=jitter)
     return cls

@@ -7,6 +7,7 @@ from . import _plotting as pl
 from . import _tools as tl
 from . import metrics
 from . import hp_scan
+from . import types
 from . import wandb
 
 __all__ = [
@@ -17,6 +18,7 @@ __all__ = [
     "metrics",
     "pl",
     "tl",
+    "types",
     "wandb",
     "__version__",
 ]
