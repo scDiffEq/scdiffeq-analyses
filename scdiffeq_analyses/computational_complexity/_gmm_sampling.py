@@ -43,7 +43,10 @@ class GaussianMixtureModelSampling:
         if not hasattr(self, "_X_raw"):
             self._X_raw = adata_query.fetch(self._adata, key="X")
             if scipy.sparse.issparse(self._X_raw):
-                self._X_raw = self._X_raw.A
+                if scipy.sparse.isspmatrix_csr(self._X_raw):
+                    self._X_raw = self._X_raw.toarray()
+                else:
+                    self._X_raw = self._X_raw.A
         return self._X_raw
 
     def _preprocess(self) -> None:

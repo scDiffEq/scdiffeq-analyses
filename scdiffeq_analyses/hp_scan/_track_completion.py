@@ -2,25 +2,27 @@
 import pandas as pd
 
 # -- import local dependencies: -----------------------------------------------
-from .. import hp_scan
+from ._get_conditions import get_conditions
 
 # -- function: ----------------------------------------------------------------
-def get_conditions(condition):
-    defaults = {
-        "mu_hidden": [512, 512],
-        "sigma_hidden": [32, 32],
-        "velocity_ratio": {"enforce": 100},
-        "seed": -1,
-    }
-    updated_condition = {}
-    for key, val in defaults.items():
-        if key in condition:
-            val = condition[key]
-        updated_condition[key] = val
-    E = updated_condition["velocity_ratio"]["enforce"]
-    updated_condition.pop("velocity_ratio")
-    updated_condition["E"] = E
-    return updated_condition
+# def get_conditions(condition):
+#     defaults = {
+#         "mu_hidden": [512, 512],
+#         "sigma_hidden": [32, 32],
+#         "velocity_ratio": {"enforce": 100, "target": 2.5},
+#         "seed": -1,
+#     }
+#     updated_condition = {}
+#     for key, val in defaults.items():
+#         if key in condition:
+#             val = condition[key]
+#         updated_condition[key] = val
+#     E = updated_condition["velocity_ratio"]["enforce"]
+#     V = updated_condition["velocity_ratio"]["target"]
+#     updated_condition.pop("velocity_ratio")
+#     updated_condition["E"] = E
+#     updated_condition["V"] = V
+#     return updated_condition
 
 
 def check_completion_tracker(tracked_completion_dict: dict):
@@ -37,7 +39,8 @@ def check_completion_tracker(tracked_completion_dict: dict):
 
 
 def track_completion(summary_df):
-    CONDITIONS = hp_scan.conditions.copy()
+    # CONDITIONS = conditions.copy()
+    CONDITIONS = get_conditions()
     available_index = list(summary_df.index).copy()
     used_index = []
     extras = []  # we want to avoid these

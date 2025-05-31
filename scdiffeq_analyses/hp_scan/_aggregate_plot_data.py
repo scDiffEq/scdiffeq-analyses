@@ -1,10 +1,8 @@
 # -- import packages: ---------------------------------------------------------
-import numpy as np
 import pandas as pd
 
 # -- import local dependencies: -----------------------------------------------
-from ._conditions import conditions
-from .. import wandb
+from ._track_completion import track_completion
 
 # -- set type hints: ----------------------------------------------------------
 from typing import Dict, List, Tuple
@@ -30,10 +28,10 @@ class PlotDataAggr:
                 self._tracked_completion,
                 self._condition_list_set,
                 self._extras,
-            ) = wandb.track_completion(self._summary_df)
+            ) = track_completion(self._summary_df)
         return self._tracked_completion
 
-    def _all_null(self, condition: Dict[int, int]):
+    def _all_null(self, condition: Dict[int, int]) -> bool:
         return all([item == None for item in condition.values()])
 
     def _update(self, idx: int, condition: dict) -> None:
@@ -47,11 +45,11 @@ class PlotDataAggr:
         self._plot_data[f"cond_{idx}.train"] = train_result
         self._plot_data[f"cond_{idx}.test"] = test_result
 
-    def _fetch_all_plot_data(self):
+    def _fetch_all_plot_data(self) -> None:
         for idx, condition in self.tracked_completion.items():
             self._update(idx=idx, condition=condition)
 
-    def subset_plot_data_over_range(self, index_range: List[int]):
+    def subset_plot_data_over_range(self, index_range: List[int]) -> Dict[str, List[float]]:
         plot_data_subset = {}
         for i in index_range:
             train = self._plot_data[f"cond_{i}.train"]

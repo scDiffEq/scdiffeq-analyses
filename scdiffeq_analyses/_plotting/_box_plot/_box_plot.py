@@ -11,7 +11,10 @@ class BoxPlot:
 
     @property
     def x(self):
-        return np.arange(len(self.y)) + 1
+        if self._use_x:
+            return np.array(list(self.data.keys()))
+        else:
+            return np.arange(len(self.y)) + 1
 
     def forward(self):
         bp = self.ax.boxplot(
@@ -80,10 +83,17 @@ class BoxPlot:
                             bp[bp_key][2 * en + 1].set_visible(False)
         return bp
 
-    def __call__(self, ax, data, mode: str = "background"):
+    def __call__(
+        self,
+        ax,
+        data,
+        use_x: bool = False,
+        mode: str = "background",
+    ):
 
         self.ax = ax
         self.data = data
         self.mode = mode
+        self._use_x = use_x
 
         return self.forward()
