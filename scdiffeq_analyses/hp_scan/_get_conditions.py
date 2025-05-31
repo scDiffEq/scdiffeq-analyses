@@ -69,7 +69,7 @@ _conditions = {
         "mu_hidden": [2048, 2048],
         "sigma_hidden": [512, 512],
         "velocity_ratio_params": {"enforce": 100, "target": 2.5},
-        "batch_size": 2048,
+        "batch_size": 512,
     },
     12: {
         "mu_hidden": [32, 32],
@@ -105,7 +105,7 @@ _conditions = {
         "mu_hidden": [2048, 2048],
         "sigma_hidden": [2048, 2048],
         "velocity_ratio_params": {"enforce": 100, "target": 2.5},
-        "batch_size": 2048,
+        "batch_size": 512,
     },
     18: {
         "mu_hidden": [32, 32],
@@ -252,5 +252,6 @@ def get_conditions(n_seeds: int = 5) -> dict:
     for seed in range(n_seeds):
         for en, condition in _conditions.items():
             condition['seed'] = seed
+            condition['condition'] = en
             conditions.append(condition.copy())
     return conditions

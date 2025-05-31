@@ -56,7 +56,9 @@ class StyledBoxPlot(ABCParse.ABCParse):
                 colors = self._colors,
                 scatter_kw = self._scatter_kw,
             )
-            foreground_scatter(ax=self.ax, data = self._data, use_x = self._use_x)
+            foreground_scatter(
+                ax=self.ax, data=self._data, use_x=self._use_x, jitter=self._jitter
+            )
 
         for en, (k, v) in enumerate(self._data.items()):
             if len(v) == 1:
@@ -68,8 +70,9 @@ class StyledBoxPlot(ABCParse.ABCParse):
                     alpha = self._scatter_kw["alpha"],
                 )
 
-    def __call__(self, data, ax: Optional[plt.Axes] = None, use_x: bool = False) -> None:
+    def __call__(self, data, ax: Optional[plt.Axes] = None, use_x: bool = False, jitter: bool = True) -> None:
         self._data = data
+        self._jitter = jitter
         if ax is None:
             fig, axes = cellplots.plot()
             ax = axes[0]
