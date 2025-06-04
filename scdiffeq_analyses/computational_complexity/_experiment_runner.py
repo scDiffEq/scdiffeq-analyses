@@ -94,7 +94,7 @@ class ExperimentRunner(ABCParse.ABCParse):
         model = sdq.scDiffEq(**MODEL_PARAMS)
 
         model.fit(
-            train_epochs=2500,
+            train_epochs=self._train_epochs,
             train_callbacks=[sdq.callbacks.StochasticWeightAveraging(swa_lrs=[1e-5])],
             ckpt_frequency=self._ckpt_frequency,
             save_last_ckpt=self._save_last_ckpt,

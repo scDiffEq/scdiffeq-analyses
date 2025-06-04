@@ -7,6 +7,7 @@ import larry
 import logging
 import pathlib
 import scdiffeq as sdq
+import shutil
 import uuid
 import wandb
 import os
@@ -122,15 +123,40 @@ class Runner(ABCParse.ABCParse):
 
     @property
     def _LOG_DIR(self):
-        return self.model._metrics_path.parent
+        if not (hasattr(self, "model") and self.model and 
+                hasattr(self.model, "DiffEq") and self.model.DiffEq and 
+                hasattr(self.model.DiffEq, "trainer") and self.model.DiffEq.trainer and
+                hasattr(self.model.DiffEq.trainer, "logger") and self.model.DiffEq.trainer.logger and
+                hasattr(self.model.DiffEq.trainer.logger, "save_dir") and self.model.DiffEq.trainer.logger.save_dir):
+            raise AttributeError(
+                "Runner.model.DiffEq.trainer.logger.save_dir is not available. "
+                "Ensure the model is initialized for the current run."
+            )
+        return pathlib.Path(self.model.DiffEq.trainer.logger.save_dir).parent
 
     @property
-    def _CKPT_DIR(self):
-        return self._LOG_DIR.joinpath("checkpoints/")
+    def _CKPT_DIR(self) -> pathlib.Path:
+        if not (hasattr(self, "model") and self.model and 
+                hasattr(self.model, "DiffEq") and self.model.DiffEq and 
+                hasattr(self.model.DiffEq, "_ckpt_path") and self.model.DiffEq._ckpt_path):
+            raise AttributeError(
+                "Runner.model.DiffEq._ckpt_path is not available. "
+                "Ensure the model is initialized for the current run before accessing checkpoints."
+            )
+        return self.model.DiffEq._ckpt_path
 
     @property
     def _CKPT_PATHS(self):
-        return self._CKPT_DIR.glob("*.ckpt")
+        # Ensure _CKPT_DIR can be resolved and exists before globbing
+        try:
+            ckpt_dir = self._CKPT_DIR
+            if not ckpt_dir.exists():
+                logger.warning(f"Checkpoint directory {ckpt_dir} does not exist.")
+                return iter([])  # Return empty iterator
+        except AttributeError as e:
+            logger.warning(f"Cannot determine checkpoint directory: {e}")
+            return iter([]) # Return empty iterator
+        return ckpt_dir.glob("*.ckpt")
 
     def _update_wandb_params(
             self,
@@ -191,17 +217,24 @@ class Runner(ABCParse.ABCParse):
         # -- note: callback automatically performs eval at pl_module.on_train_end()
         # Ensure checkpoint directory exists
         os.makedirs(self._CKPT_DIR, exist_ok=True)
-        
+
         # Save the checkpoint manually
         ckpt_fname = f"on_train_end.epoch_{self.model.DiffEq.current_epoch}.ckpt"
         ckpt_fpath = self._CKPT_DIR.joinpath(ckpt_fname)
         self.model.DiffEq.trainer.save_checkpoint(ckpt_fpath)
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: SAVED CHECKPOINT: {ckpt_fpath}")
-        
+
         self._log_model_ckpt_as_wandb_artifact(seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id)
         self._wandb_fate_prediction_metrics_logging(
             seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath
         )
+
+    def export_model_ckpts(self, seed: int, run_id: str) -> None:
+        
+        output_dir = pathlib.Path(f"/output/run_id_{run_id}-seed_{seed}")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        for ckpt_fpath in self._CKPT_PATHS:
+            shutil.copy(ckpt_fpath, output_dir)
 
     def fate_prediction_evaluation(self, seed: int, ckpt_fpath: pathlib.Path, run_id: str) -> None:
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: EVALUATING CKPT: {ckpt_fpath}")
@@ -211,8 +244,13 @@ class Runner(ABCParse.ABCParse):
 
         self.model.DiffEq = sdq.io.load_diffeq(ckpt_fpath)
         self.model.to(autodevice.AutoDevice())
+        
+        # Use run-specific log directory for fate prediction callback
+        # This should be the parent of the wandb logger's save_dir (e.g., wandb/project/run_id/)
+        run_specific_log_dir = pathlib.Path(self.model.DiffEq.trainer.logger.save_dir).parent
+        
         self._FATE_PREDICTION_CALLBACK.forward(
-            pl_module=self.model.DiffEq, ckpt_name=ckpt_fname, log_dir=self._LOG_DIR
+            pl_module=self.model.DiffEq, ckpt_name=ckpt_fname, log_dir=run_specific_log_dir
         )
         self._wandb_fate_prediction_metrics_logging(seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath)
 
@@ -226,11 +264,38 @@ class Runner(ABCParse.ABCParse):
             )
     def forward(self, seed: int) -> None:
 
-        wandb.init(project=self._project_name)
-        wandb_logger, params, run_id = self._setup_run(seed=seed)
-        self.fit_model(seed=seed, run_id=run_id, params=params)
-        self.evaluate_model(seed=seed, run_id=run_id)
-        wandb.finish()
+        wandb_logger, params, run_id = None, None, None # Initialize to allow access in finally
+        try:
+            wandb.init(project=self._project_name)
+            wandb_logger, params, run_id = self._setup_run(seed=seed)
+            self.fit_model(seed=seed, run_id=run_id, params=params)
+            # export_model_ckpts is likely redundant if ckpts are logged to wandb directly
+            # self.export_model_ckpts(seed=seed, run_id=run_id)
+            self.evaluate_model(seed=seed, run_id=run_id)
+        except Exception as e:
+            logger.error(f"Error during model run [run_id: {run_id}, seed: {seed}]: {e}", exc_info=True)
+            # Potentially re-raise the exception if you want the overall process to fail
+            # raise e 
+        finally:
+            # Ensure all checkpoints from the run are logged as artifacts
+            if hasattr(self, "model") and self.model and hasattr(self.model, "DiffEq") and self.model.DiffEq and hasattr(self.model.DiffEq, "_ckpt_path") and self.model.DiffEq._ckpt_path:
+                final_ckpt_dir = self.model.DiffEq._ckpt_path
+                if final_ckpt_dir and final_ckpt_dir.exists() and run_id:
+                    logger.info(f"Attempting to log all checkpoints from {final_ckpt_dir} for run_id: {run_id}, seed: {seed}")
+                    for ckpt_fpath in final_ckpt_dir.glob("*.ckpt"):
+                        try:
+                            logger.info(f"Logging checkpoint {ckpt_fpath.name} to wandb artifacts.")
+                            self._log_model_ckpt_as_wandb_artifact(seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id)
+                        except Exception as log_e:
+                            logger.error(f"Failed to log checkpoint {ckpt_fpath.name} for run_id {run_id}, seed {seed}: {log_e}")
+                else:
+                    logger.warning(f"Could not log all checkpoints for run_id: {run_id}, seed: {seed}. Checkpoint directory or run_id missing.")
+            else:
+                logger.warning(f"Model or checkpoint path not available for final artifact logging. run_id: {run_id}, seed: {seed}")
+
+            if wandb.run is not None:
+                wandb.finish()
+            logger.info(f"Finished wandb run for seed: {seed}, run_id: {run_id}")
 
     def __call__(
         self,
