@@ -1,0 +1,54 @@
+adjoint: false
+backend: auto
+batch_size: 2048
+brownian_dim: 1
+coef_diffusion: 1.0
+coef_drift: 1.0
+dt: 0.1
+groupby: t
+h5ad_path: null
+latent_dim: 50
+loading_existing: false
+mu_activation: LeakyReLU
+mu_bias: true
+mu_dropout: 0
+mu_hidden:
+- 512
+- 512
+mu_n_augment: 0
+mu_output_bias: true
+n_predict: 2000
+name: LightningSDE-FixedPotential-RegularizedVelocityRatio
+noise_type: general
+num_workers: 0
+obs_keys:
+- W
+predict_key: predict
+sde_type: ito
+shuffle: true
+shuffle_time_labels: false
+sigma_activation: LeakyReLU
+sigma_bias: true
+sigma_dropout: 0
+sigma_hidden:
+- 32
+- 32
+sigma_n_augment: 0
+sigma_output_bias: true
+silent: true
+test_key: test
+train_key: train
+train_lr: 4.0e-05
+train_optimizer: !!python/name:torch.optim.rmsprop.RMSprop ''
+train_scheduler: !!python/name:torch.optim.lr_scheduler.StepLR ''
+train_step_size: 100
+train_val_split:
+- 0.9
+- 0.1
+use_key: X_pca
+val_key: val
+velocity_ratio_params:
+  enforce: 100
+  method: square
+  target: 2.5
+weight_key: W
