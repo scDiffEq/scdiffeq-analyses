@@ -38,7 +38,7 @@ sigma_output_bias: true
 silent: true
 test_key: test
 train_key: train
-train_lr: 4.0e-05
+train_lr: 0.0001
 train_optimizer: !!python/name:torch.optim.rmsprop.RMSprop ''
 train_scheduler: !!python/name:torch.optim.lr_scheduler.StepLR ''
 train_step_size: 1500
