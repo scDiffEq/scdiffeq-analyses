@@ -1,6 +1,6 @@
 adjoint: false
 backend: auto
-batch_size: 2048
+batch_size: 512
 brownian_dim: 1
 coef_diffusion: 1.0
 coef_drift: 1.0
