@@ -144,7 +144,7 @@ class Runner(ABCParse.ABCParse):
                 "Runner.model.DiffEq.trainer.logger.save_dir is not available. "
                 "Ensure the model is initialized for the current run."
             )
-        return pathlib.Path(self.model.DiffEq.trainer.logger.save_dir).parent
+        return pathlib.Path(self.model._metrics_path).parent
 
     @property
     def _CKPT_DIR(self) -> pathlib.Path:
