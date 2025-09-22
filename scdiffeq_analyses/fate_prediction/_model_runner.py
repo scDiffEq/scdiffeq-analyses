@@ -21,6 +21,7 @@ from typing import Any, Dict, List, Literal, Optional, Union, Tuple
 # -- configure logger: --------------------------------------------------------
 logger = logging.getLogger(__name__)
 
+
 # -- cls: ---------------------------------------------------------------------
 class Runner(ABCParse.ABCParse):
     _script_name = pathlib.Path(__file__).name
@@ -30,6 +31,8 @@ class Runner(ABCParse.ABCParse):
         h5ad_path: Union[pathlib.Path, str],
         project_name: str,
         wandb_api_key: str,
+        annotate_default_train: bool = False,
+        subset: bool = False,
         time_key: str = "median_qbin",  # "t",  # "Time point",
         time_point: float = 2,
         weight_key: str = "W",
@@ -59,8 +62,10 @@ class Runner(ABCParse.ABCParse):
         if not hasattr(self, "_ADATA"):
             self._ADATA = funcs.load_adata(
                 h5ad_path=self._h5ad_path,
+                subset=self._subset,
                 weight_key=self._weight_key,
-                time_key="Time point", # real time points
+                time_key="Time point",  # real time points
+                annotate_default_train=self._annotate_default_train,
             )
         return self._ADATA
 
@@ -99,7 +104,7 @@ class Runner(ABCParse.ABCParse):
 
         return ckpt_fname
 
-    def _compose_model_params(self, seed: int) -> Dict[str,Any]:
+    def _compose_model_params(self, seed: int) -> Dict[str, Any]:
         return {
             "adata": self.adata,
             "seed": seed,
@@ -123,11 +128,18 @@ class Runner(ABCParse.ABCParse):
 
     @property
     def _LOG_DIR(self):
-        if not (hasattr(self, "model") and self.model and 
-                hasattr(self.model, "DiffEq") and self.model.DiffEq and 
-                hasattr(self.model.DiffEq, "trainer") and self.model.DiffEq.trainer and
-                hasattr(self.model.DiffEq.trainer, "logger") and self.model.DiffEq.trainer.logger and
-                hasattr(self.model.DiffEq.trainer.logger, "save_dir") and self.model.DiffEq.trainer.logger.save_dir):
+        if not (
+            hasattr(self, "model")
+            and self.model
+            and hasattr(self.model, "DiffEq")
+            and self.model.DiffEq
+            and hasattr(self.model.DiffEq, "trainer")
+            and self.model.DiffEq.trainer
+            and hasattr(self.model.DiffEq.trainer, "logger")
+            and self.model.DiffEq.trainer.logger
+            and hasattr(self.model.DiffEq.trainer.logger, "save_dir")
+            and self.model.DiffEq.trainer.logger.save_dir
+        ):
             raise AttributeError(
                 "Runner.model.DiffEq.trainer.logger.save_dir is not available. "
                 "Ensure the model is initialized for the current run."
@@ -136,9 +148,14 @@ class Runner(ABCParse.ABCParse):
 
     @property
     def _CKPT_DIR(self) -> pathlib.Path:
-        if not (hasattr(self, "model") and self.model and 
-                hasattr(self.model, "DiffEq") and self.model.DiffEq and 
-                hasattr(self.model.DiffEq, "_ckpt_path") and self.model.DiffEq._ckpt_path):
+        if not (
+            hasattr(self, "model")
+            and self.model
+            and hasattr(self.model, "DiffEq")
+            and self.model.DiffEq
+            and hasattr(self.model.DiffEq, "_ckpt_path")
+            and self.model.DiffEq._ckpt_path
+        ):
             raise AttributeError(
                 "Runner.model.DiffEq._ckpt_path is not available. "
                 "Ensure the model is initialized for the current run before accessing checkpoints."
@@ -155,15 +172,15 @@ class Runner(ABCParse.ABCParse):
                 return iter([])  # Return empty iterator
         except AttributeError as e:
             logger.warning(f"Cannot determine checkpoint directory: {e}")
-            return iter([]) # Return empty iterator
+            return iter([])  # Return empty iterator
         return ckpt_dir.glob("*.ckpt")
 
     def _update_wandb_params(
-            self,
-            run_id: str,
-            params: Dict[str, Any],
-            wandb_logger: wandb.sdk.wandb_run.Run,
-        ) -> Tuple[wandb.sdk.wandb_run.Run, Dict[str, Any]]:
+        self,
+        run_id: str,
+        params: Dict[str, Any],
+        wandb_logger: wandb.sdk.wandb_run.Run,
+    ) -> Tuple[wandb.sdk.wandb_run.Run, Dict[str, Any]]:
         """Update the wandb parameters and return the wandb logger and params."""
         # Create a copy of params excluding the adata object to prevent serialization issues
         wandb_params = {k: v for k, v in params.items() if k != "adata"}
@@ -178,14 +195,18 @@ class Runner(ABCParse.ABCParse):
         wandb_logger = lightning.pytorch.loggers.WandbLogger(project=self._project_name)
         self._log_script_as_wandb_artifact(run_id=run_id)
         params = self._compose_model_params(seed=seed)
-        wandb_logger, params = self._update_wandb_params(run_id=run_id, params=params, wandb_logger=wandb_logger)
+        wandb_logger, params = self._update_wandb_params(
+            run_id=run_id, params=params, wandb_logger=wandb_logger
+        )
         logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: CONSTRUCTED")
         return wandb_logger, params, run_id
 
     def _wandb_fate_prediction_metrics_logging(
         self, seed: int, run_id: str, ckpt_fpath
     ) -> None:
-        logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: SETUP WANDB FATE PREDICTION METRICS LOGGING")
+        logger.info(
+            f"Model run [run_id: {run_id}, seed: {seed}]: SETUP WANDB FATE PREDICTION METRICS LOGGING"
+        )
         ckpt_fname = self._format_ckpt_fname(ckpt_fpath)
         artifact = wandb.Artifact(
             name=f"fate-prediction-metrics-seed_{seed}-{ckpt_fname}-run_id_{run_id}",
@@ -222,37 +243,51 @@ class Runner(ABCParse.ABCParse):
         ckpt_fname = f"on_train_end.epoch_{self.model.DiffEq.current_epoch}.ckpt"
         ckpt_fpath = self._CKPT_DIR.joinpath(ckpt_fname)
         self.model.DiffEq.trainer.save_checkpoint(ckpt_fpath)
-        logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: SAVED CHECKPOINT: {ckpt_fpath}")
+        logger.info(
+            f"Model run [run_id: {run_id}, seed: {seed}]: SAVED CHECKPOINT: {ckpt_fpath}"
+        )
 
-        self._log_model_ckpt_as_wandb_artifact(seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id)
+        self._log_model_ckpt_as_wandb_artifact(
+            seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id
+        )
         self._wandb_fate_prediction_metrics_logging(
             seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath
         )
 
     def export_model_ckpts(self, seed: int, run_id: str) -> None:
-        
+
         output_dir = pathlib.Path(f"/output/run_id_{run_id}-seed_{seed}")
         output_dir.mkdir(parents=True, exist_ok=True)
         for ckpt_fpath in self._CKPT_PATHS:
             shutil.copy(ckpt_fpath, output_dir)
 
-    def fate_prediction_evaluation(self, seed: int, ckpt_fpath: pathlib.Path, run_id: str) -> None:
-        logger.info(f"Model run [run_id: {run_id}, seed: {seed}]: EVALUATING CKPT: {ckpt_fpath}")
+    def fate_prediction_evaluation(
+        self, seed: int, ckpt_fpath: pathlib.Path, run_id: str
+    ) -> None:
+        logger.info(
+            f"Model run [run_id: {run_id}, seed: {seed}]: EVALUATING CKPT: {ckpt_fpath}"
+        )
         ckpt_fname = self._log_model_ckpt_as_wandb_artifact(
             seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id
         )
 
         self.model.DiffEq = sdq.io.load_diffeq(ckpt_fpath)
         self.model.to(autodevice.AutoDevice())
-        
+
         # Use run-specific log directory for fate prediction callback
         # This should be the parent of the wandb logger's save_dir (e.g., wandb/project/run_id/)
-        run_specific_log_dir = pathlib.Path(self.model.DiffEq.trainer.logger.save_dir).parent
-        
+        run_specific_log_dir = pathlib.Path(
+            self.model.DiffEq.trainer.logger.save_dir
+        ).parent
+
         self._FATE_PREDICTION_CALLBACK.forward(
-            pl_module=self.model.DiffEq, ckpt_name=ckpt_fname, log_dir=run_specific_log_dir
+            pl_module=self.model.DiffEq,
+            ckpt_name=ckpt_fname,
+            log_dir=run_specific_log_dir,
         )
-        self._wandb_fate_prediction_metrics_logging(seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath)
+        self._wandb_fate_prediction_metrics_logging(
+            seed=seed, run_id=run_id, ckpt_fpath=ckpt_fpath
+        )
 
     def evaluate_model(self, seed: int, run_id: str) -> None:
 
@@ -262,9 +297,14 @@ class Runner(ABCParse.ABCParse):
             self.fate_prediction_evaluation(
                 seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id
             )
+
     def forward(self, seed: int) -> None:
 
-        wandb_logger, params, run_id = None, None, None # Initialize to allow access in finally
+        wandb_logger, params, run_id = (
+            None,
+            None,
+            None,
+        )  # Initialize to allow access in finally
         try:
             wandb.init(project=self._project_name)
             wandb_logger, params, run_id = self._setup_run(seed=seed)
@@ -273,25 +313,47 @@ class Runner(ABCParse.ABCParse):
             # self.export_model_ckpts(seed=seed, run_id=run_id)
             self.evaluate_model(seed=seed, run_id=run_id)
         except Exception as e:
-            logger.error(f"Error during model run [run_id: {run_id}, seed: {seed}]: {e}", exc_info=True)
+            logger.error(
+                f"Error during model run [run_id: {run_id}, seed: {seed}]: {e}",
+                exc_info=True,
+            )
             # Potentially re-raise the exception if you want the overall process to fail
-            # raise e 
+            # raise e
         finally:
             # Ensure all checkpoints from the run are logged as artifacts
-            if hasattr(self, "model") and self.model and hasattr(self.model, "DiffEq") and self.model.DiffEq and hasattr(self.model.DiffEq, "_ckpt_path") and self.model.DiffEq._ckpt_path:
+            if (
+                hasattr(self, "model")
+                and self.model
+                and hasattr(self.model, "DiffEq")
+                and self.model.DiffEq
+                and hasattr(self.model.DiffEq, "_ckpt_path")
+                and self.model.DiffEq._ckpt_path
+            ):
                 final_ckpt_dir = self.model.DiffEq._ckpt_path
                 if final_ckpt_dir and final_ckpt_dir.exists() and run_id:
-                    logger.info(f"Attempting to log all checkpoints from {final_ckpt_dir} for run_id: {run_id}, seed: {seed}")
+                    logger.info(
+                        f"Attempting to log all checkpoints from {final_ckpt_dir} for run_id: {run_id}, seed: {seed}"
+                    )
                     for ckpt_fpath in final_ckpt_dir.glob("*.ckpt"):
                         try:
-                            logger.info(f"Logging checkpoint {ckpt_fpath.name} to wandb artifacts.")
-                            self._log_model_ckpt_as_wandb_artifact(seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id)
+                            logger.info(
+                                f"Logging checkpoint {ckpt_fpath.name} to wandb artifacts."
+                            )
+                            self._log_model_ckpt_as_wandb_artifact(
+                                seed=seed, ckpt_fpath=ckpt_fpath, run_id=run_id
+                            )
                         except Exception as log_e:
-                            logger.error(f"Failed to log checkpoint {ckpt_fpath.name} for run_id {run_id}, seed {seed}: {log_e}")
+                            logger.error(
+                                f"Failed to log checkpoint {ckpt_fpath.name} for run_id {run_id}, seed {seed}: {log_e}"
+                            )
                 else:
-                    logger.warning(f"Could not log all checkpoints for run_id: {run_id}, seed: {seed}. Checkpoint directory or run_id missing.")
+                    logger.warning(
+                        f"Could not log all checkpoints for run_id: {run_id}, seed: {seed}. Checkpoint directory or run_id missing."
+                    )
             else:
-                logger.warning(f"Model or checkpoint path not available for final artifact logging. run_id: {run_id}, seed: {seed}")
+                logger.warning(
+                    f"Model or checkpoint path not available for final artifact logging. run_id: {run_id}, seed: {seed}"
+                )
 
             if wandb.run is not None:
                 wandb.finish()
