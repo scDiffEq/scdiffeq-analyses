@@ -148,40 +148,21 @@ class Runner(ABCParse.ABCParse):
 
     @property
     def _CKPT_DIR(self) -> pathlib.Path:
-        # First try to get the checkpoint path from the model
-        if (
-            hasattr(self, "model")
-            and self.model
-            and hasattr(self.model, "DiffEq")
-            and self.model.DiffEq
-            and hasattr(self.model.DiffEq, "_ckpt_path")
-            and self.model.DiffEq._ckpt_path
-        ):
-            return self.model.DiffEq._ckpt_path
-
-        # If _ckpt_path is not available, try to construct it from the logger save_dir
-        if (
-            hasattr(self, "model")
-            and self.model
-            and hasattr(self.model, "DiffEq")
-            and self.model.DiffEq
-            and hasattr(self.model.DiffEq, "trainer")
-            and self.model.DiffEq.trainer
-            and hasattr(self.model.DiffEq.trainer, "logger")
-            and self.model.DiffEq.trainer.logger
-            and hasattr(self.model.DiffEq.trainer.logger, "save_dir")
-            and self.model.DiffEq.trainer.logger.save_dir
-        ):
-            # Construct checkpoint directory from logger save_dir
-            log_dir = pathlib.Path(self.model.DiffEq.trainer.logger.save_dir)
-            ckpt_dir = log_dir / "checkpoints"
-            return ckpt_dir
-
-        # If neither approach works, raise an error
-        raise AttributeError(
-            "Runner.model.DiffEq._ckpt_path is not available and cannot be constructed from logger save_dir. "
-            "Ensure the model is initialized for the current run before accessing checkpoints."
-        )
+        ckpt_dir = self.model._metrics_path.parent.joinpath("checkpoints")
+        return ckpt_dir
+        # if not (
+        #     hasattr(self, "model")
+        #     and self.model
+        #     and hasattr(self.model, "DiffEq")
+        #     and self.model.DiffEq
+        #     and hasattr(self.model.DiffEq, "_ckpt_path")
+        #     and self.model.DiffEq._ckpt_path
+        # ):
+        #     raise AttributeError(
+        #         "Runner.model.DiffEq._ckpt_path is not available. "
+        #         "Ensure the model is initialized for the current run before accessing checkpoints."
+        #     )
+        # return self.model.DiffEq._ckpt_path
 
     @property
     def _CKPT_PATHS(self):
@@ -258,17 +239,12 @@ class Runner(ABCParse.ABCParse):
 
         # -- note: callback automatically performs eval at pl_module.on_train_end()
         # Ensure checkpoint directory exists
-        ckpt_dir = self._CKPT_DIR
-        os.makedirs(ckpt_dir, exist_ok=True)
+        os.makedirs(self._CKPT_DIR, exist_ok=True)
 
         # Save the checkpoint manually
         ckpt_fname = f"on_train_end.epoch_{self.model.DiffEq.current_epoch}.ckpt"
-        ckpt_fpath = ckpt_dir.joinpath(ckpt_fname)
+        ckpt_fpath = self._CKPT_DIR.joinpath(ckpt_fname)
         self.model.DiffEq.trainer.save_checkpoint(ckpt_fpath)
-
-        # Set the _ckpt_path attribute on the DiffEq object for future access
-        self.model.DiffEq._ckpt_path = ckpt_dir
-
         logger.info(
             f"Model run [run_id: {run_id}, seed: {seed}]: SAVED CHECKPOINT: {ckpt_fpath}"
         )
