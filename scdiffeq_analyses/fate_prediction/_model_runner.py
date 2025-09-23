@@ -279,7 +279,8 @@ class Runner(ABCParse.ABCParse):
         # Use run-specific log directory for fate prediction callback
         # This should be the parent of the wandb logger's save_dir (e.g., wandb/project/run_id/)
         run_specific_log_dir = pathlib.Path(
-            self.model.DiffEq.trainer.logger.save_dir
+            self.model._metrics_path,
+            # self.model.DiffEq.trainer.logger.save_dir
         ).parent
 
         self._FATE_PREDICTION_CALLBACK.forward(
