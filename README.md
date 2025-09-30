@@ -1,3 +1,5 @@
+<a href="https://doi.org/10.5281/zenodo.17238610"><img src="https://zenodo.org/badge/864989005.svg" alt="DOI"></a>
+
 # scDiffEq Analyses
 
 Notebooks, figures, files, and helper functions to reproduce the analyses presented in the scDiffEq manuscript.
